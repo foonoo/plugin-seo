@@ -4,14 +4,15 @@ namespace nyansapow\plugins\contrib\seo;
 
 use nyansapow\Plugin;
 use nyansapow\events\PageOutputGenerated;
+use nyansapow\sites\AbstractSite;
 
 class SeoPlugin extends Plugin
 {
+    private $site;
+
     public function getEvents()
     {
-        return [
-            PageOutputGenerated::class => [$this, 'injectTags'],
-        ];
+        return [PageOutputGenerated::class => [$this, 'injectTags']];
     }
 
     /**
@@ -71,16 +72,36 @@ class SeoPlugin extends Plugin
         }
         $head->appendChild(
             $this->getMetaTag($head->ownerDocument, 'keywords',
-            implode(", ", $metaData['frontmatter']['tags']))
+                implode(", ", $metaData['frontmatter']['tags']))
         );
     }
 
-    private function setImage(array $metaData, \DOMNode $head)
+    private function setImage(AbstractSite $site, array $metaData, \DOMNode $head)
     {
-        if(!isset($metaData['frontmatter']['image'])) {
+        if (!isset($metaData['frontmatter']['image'])) {
             return;
         }
-        $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:image', $metaData['frontmatter']['image']));
+        $imagePath = $site->getSourcePath("np_images/{$metaData['frontmatter']['image']}");
+        if (file_exists($imagePath)) {
+            $head->appendChild(
+                $this->getMetaTag(
+                    $head->ownerDocument, 'og:image',
+                    ($site->getMetaData()['url'] ?? '') . "/np_images/{$metaData['frontmatter']['image']}"
+                )
+            );
+        }
+    }
+
+    private function setSiteDetails(array $siteMetadata, array $postMetadata, \DOMNode $head)
+    {
+        if(isset($siteMetadata['name'])) {
+            $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:site_name', $siteMetadata['name']));
+        }
+        if(isset($siteMetadata['url']) && isset($postMetadata['path'])) {
+            $head->appendChild(
+                $this->getMetaTag($head->ownerDocument, 'og:url', $siteMetadata['url'] . "/" . $postMetadata['path'])
+            );
+        }
     }
 
     public function injectTags(PageOutputGenerated $event)
@@ -91,12 +112,14 @@ class SeoPlugin extends Plugin
             return;
         }
         $page = $event->getPage();
+        $site = $event->getSite();
         $metaData = $page->getMetaData();
         $headTag = $this->getHeader($dom);
         $this->setDescription($metaData, $headTag);
         $this->setTitle($metaData, $headTag);
         $this->setKeywords($metaData, $headTag);
-        $this->setImage($metaData, $headTag);
+        $this->setImage($site, $metaData, $headTag);
+        $this->setSiteDetails($site->getMetaData(), $metaData, $headTag);
         $headTag->appendChild($this->getMetaTag($dom, 'twitter:card', 'summary'));
     }
 }
