@@ -1,10 +1,10 @@
 <?php
 
-namespace nyansapow\plugins\contrib\seo;
+namespace foonoo\plugins\contrib\seo;
 
-use nyansapow\Plugin;
-use nyansapow\events\PageOutputGenerated;
-use nyansapow\sites\AbstractSite;
+use foonoo\Plugin;
+use foonoo\events\PageOutputGenerated;
+use foonoo\sites\AbstractSite;
 
 class SeoPlugin extends Plugin
 {
@@ -120,6 +120,6 @@ class SeoPlugin extends Plugin
         $this->setKeywords($metaData, $headTag);
         $this->setImage($site, $metaData, $headTag);
         $this->setSiteDetails($site->getMetaData(), $metaData, $headTag);
-        $headTag->appendChild($this->getMetaTag($dom, 'twitter:card', 'summary'));
+        $headTag->appendChild($this->getMetaTag($dom, 'twitter:card', 'summary_large_image'));
     }
 }
