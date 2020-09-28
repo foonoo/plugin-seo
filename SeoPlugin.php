@@ -3,7 +3,7 @@
 namespace foonoo\plugins\contrib\seo;
 
 use foonoo\Plugin;
-use foonoo\events\PageOutputGenerated;
+use foonoo\events\ContentOutputGenerated;
 use foonoo\sites\AbstractSite;
 
 class SeoPlugin extends Plugin
@@ -12,7 +12,7 @@ class SeoPlugin extends Plugin
 
     public function getEvents()
     {
-        return [PageOutputGenerated::class => [$this, 'injectTags']];
+        return [ContentOutputGenerated::class => [$this, 'injectTags']];
     }
 
     /**
@@ -104,7 +104,7 @@ class SeoPlugin extends Plugin
         }
     }
 
-    public function injectTags(PageOutputGenerated $event)
+    public function injectTags(ContentOutputGenerated $event)
     {
         try {
             $dom = $event->getDOM();
