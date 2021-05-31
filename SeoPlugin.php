@@ -81,12 +81,12 @@ class SeoPlugin extends Plugin
         if (!isset($metaData['frontmatter']['image'])) {
             return;
         }
-        $imagePath = $site->getSourcePath("np_images/{$metaData['frontmatter']['image']}");
+        $imagePath = $site->getSourcePath("_foonoo/images/{$metaData['frontmatter']['image']}");
         if (file_exists($imagePath)) {
             $head->appendChild(
                 $this->getMetaTag(
                     $head->ownerDocument, 'og:image',
-                    ($site->getMetaData()['url'] ?? '') . "/np_images/{$metaData['frontmatter']['image']}"
+                    ($site->getMetaData()['url'] ?? '') . "/images/{$metaData['frontmatter']['image']}"
                 )
             );
         }
