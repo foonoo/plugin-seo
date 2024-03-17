@@ -1,6 +1,6 @@
 <?php
 
-namespace foonoo\plugins\contrib\seo;
+namespace foonoo\plugins\foonoo\seo;
 
 use foonoo\Plugin;
 use foonoo\events\ContentLayoutApplied;
