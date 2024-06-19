@@ -6,9 +6,12 @@ use foonoo\Plugin;
 use foonoo\events\ContentLayoutApplied;
 use foonoo\sites\AbstractSite;
 
+/**
+ * The SEO plugin injects code that provides more information about pages to search engines.
+ */
 class SeoPlugin extends Plugin
 {
-    private $site;
+    private AbstractSite $site;
 
     public function getEvents()
     {
@@ -35,7 +38,7 @@ class SeoPlugin extends Plugin
      * @param $value
      * @param string $tag
      */
-    private function getMetaTag(\DOMDocument $dom, string $value, string $content, string $attribute = 'name')
+    private function getMetaTag(\DOMDocument $dom, string $value, string $content, string $attribute = 'name') : \DomElement
     {
         $tag = $dom->createElement('meta');
         $tag->setAttribute($attribute, $value);
@@ -47,7 +50,7 @@ class SeoPlugin extends Plugin
      * @param $metaData
      * @param $head
      */
-    private function setDescription(array $metaData, \DOMNode $head)
+    private function setDescription(array $metaData, \DOMNode $head) : void
     {
         if (!isset($metaData['frontmatter']['description'])) {
             return;
@@ -57,7 +60,7 @@ class SeoPlugin extends Plugin
         $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:desciption', $description));
     }
 
-    private function setTitle(array $metaData, \DOMNode $head)
+    private function setTitle(array $metaData, \DOMNode $head) : void
     {
         if (!isset($metaData['title'])) {
             return;
@@ -65,7 +68,7 @@ class SeoPlugin extends Plugin
         $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:title', $metaData['title']));
     }
 
-    private function setKeywords(array $metaData, \DOMNode $head)
+    private function setKeywords(array $metaData, \DOMNode $head) : void
     {
         if (!isset($metaData['frontmatter']['tags'])) {
             return;
@@ -76,7 +79,7 @@ class SeoPlugin extends Plugin
         );
     }
 
-    private function setImage(AbstractSite $site, array $metaData, \DOMNode $head)
+    private function setImage(AbstractSite $site, array $metaData, \DOMNode $head) : void
     {
         if (!isset($metaData['frontmatter']['image'])) {
             return;
@@ -92,7 +95,7 @@ class SeoPlugin extends Plugin
         }
     }
 
-    private function setSiteDetails(array $siteMetadata, array $postMetadata, \DOMNode $head)
+    private function setSiteDetails(array $siteMetadata, array $postMetadata, \DOMNode $head) : void
     {
         if(isset($siteMetadata['name'])) {
             $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:site_name', $siteMetadata['name']));
@@ -104,7 +107,7 @@ class SeoPlugin extends Plugin
         }
     }
 
-    public function injectTags(ContentLayoutApplied $event)
+    public function injectTags(ContentLayoutApplied $event) : void
     {
         try {
             $dom = $event->getDOM();
