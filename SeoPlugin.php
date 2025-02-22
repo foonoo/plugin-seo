@@ -2,6 +2,9 @@
 
 namespace foonoo\plugins\foonoo\seo;
 
+use Dom\Element;
+use Dom\HTMLDocument;
+use Dom\HTMLElement;
 use foonoo\Plugin;
 use foonoo\events\ContentLayoutApplied;
 use foonoo\sites\AbstractSite;
@@ -21,16 +24,16 @@ class SeoPlugin extends Plugin
     /**
      * @param $dom
      */
-    private function getHeader(\DOMDocument $dom)
-    {
-        $heads = $dom->getElementsByTagName("head");
-        if ($heads->count() == 0) {
-            $newHead = $dom->createElement("head");
-            $dom->getElementsByTagName("html")->item(0)->appendChild($newHead);
-            return $newHead;
-        }
-        return $heads->item(0);
-    }
+//    private function getHeader(HTMLDocument $dom)
+//    {
+//        $head = $dom->querySelector("head");
+//        if ($head === null) {
+//            $newHead = $dom->createElement("head");
+//            $dom->h //getElementsByTagName("html")->item(0)->appendChild($newHead);
+//            return $newHead;
+//        }
+//        return $heads->item(0);
+//    }
 
     /**
      * @param $dom
@@ -38,7 +41,7 @@ class SeoPlugin extends Plugin
      * @param $value
      * @param string $tag
      */
-    private function getMetaTag(\DOMDocument $dom, string $value, string $content, string $attribute = 'name') : \DomElement
+    private function getMetaTag(HTMLDocument $dom, string $value, string $content, string $attribute = 'name') : Element
     {
         $tag = $dom->createElement('meta');
         $tag->setAttribute($attribute, $value);
@@ -50,7 +53,7 @@ class SeoPlugin extends Plugin
      * @param $metaData
      * @param $head
      */
-    private function setDescription(array $metaData, \DOMNode $head) : void
+    private function setDescription(array $metaData, HTMLElement $head) : void
     {
         if (!isset($metaData['frontmatter']['description'])) {
             return;
@@ -60,7 +63,7 @@ class SeoPlugin extends Plugin
         $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:desciption', $description));
     }
 
-    private function setTitle(array $metaData, \DOMNode $head) : void
+    private function setTitle(array $metaData, Element $head) : void
     {
         if (!isset($metaData['title'])) {
             return;
@@ -68,7 +71,7 @@ class SeoPlugin extends Plugin
         $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:title', $metaData['title']));
     }
 
-    private function setKeywords(array $metaData, \DOMNode $head) : void
+    private function setKeywords(array $metaData, HTMLElement $head) : void
     {
         if (!isset($metaData['frontmatter']['tags'])) {
             return;
@@ -79,7 +82,7 @@ class SeoPlugin extends Plugin
         );
     }
 
-    private function setImage(AbstractSite $site, array $metaData, \DOMNode $head) : void
+    private function setImage(AbstractSite $site, array $metaData, HTMLElement $head) : void
     {
         if (!isset($metaData['frontmatter']['image'])) {
             return;
@@ -95,7 +98,7 @@ class SeoPlugin extends Plugin
         }
     }
 
-    private function setSiteDetails(array $siteMetadata, array $postMetadata, \DOMNode $head) : void
+    private function setSiteDetails(array $siteMetadata, array $postMetadata, HTMLElement $head) : void
     {
         if(isset($siteMetadata['name'])) {
             $head->appendChild($this->getMetaTag($head->ownerDocument, 'og:site_name', $siteMetadata['name']));
@@ -117,12 +120,12 @@ class SeoPlugin extends Plugin
         $page = $event->getContent();
         $site = $event->getSite();
         $metaData = $page->getMetaData();
-        $headTag = $this->getHeader($dom);
-        $this->setDescription($metaData, $headTag);
-        $this->setTitle($metaData, $headTag);
-        $this->setKeywords($metaData, $headTag);
-        $this->setImage($site, $metaData, $headTag);
-        $this->setSiteDetails($site->getMetaData(), $metaData, $headTag);
-        $headTag->appendChild($this->getMetaTag($dom, 'twitter:card', 'summary_large_image'));
+        //$headTag = $this->getHeader($dom);
+        $this->setDescription($metaData, $dom->head);
+        $this->setTitle($metaData, $dom->head);
+        $this->setKeywords($metaData, $dom->head);
+        $this->setImage($site, $metaData, $dom->head);
+        $this->setSiteDetails($site->getMetaData(), $metaData, $dom->head);
+        $dom->head->appendChild($this->getMetaTag($dom, 'twitter:card', 'summary_large_image'));
     }
 }
